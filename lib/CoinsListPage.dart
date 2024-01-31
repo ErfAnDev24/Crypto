@@ -11,12 +11,28 @@ class CoinsListPage extends StatefulWidget {
 }
 
 class _CoinsListPageState extends State<CoinsListPage> {
+  List<Coins>? passedCoins;
+
+  @override
+  void initState() {
+    passedCoins = widget.coins;
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Text('ErfAn'),
-      ),
+          child: ListView.builder(
+        itemCount: passedCoins!.length,
+        itemBuilder: (context, index) {
+          return ListTile(
+            title: Text(
+              passedCoins![index].name.toString(),
+            ),
+          );
+        },
+      )),
     );
   }
 }
