@@ -34,71 +34,86 @@ class _CoinsListPageState extends State<CoinsListPage> {
       ),
       backgroundColor: Color.fromARGB(255, 28, 28, 28),
       body: SafeArea(
-        child: RefreshIndicator(
-          color: Colors.white,
-          backgroundColor: Color.fromARGB(255, 38, 252, 202),
-          child: ListView.builder(
-            itemCount: passedCoins!.length,
-            itemBuilder: (context, index) {
-              return ListTile(
-                leading: Text(
-                  passedCoins![index].rank.toString(),
-                  style: TextStyle(color: Colors.white),
-                ),
-                trailing: Container(
-                  width: 100,
-                  child:
-                      Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                    Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          double.parse(passedCoins![index].priceUsd.toString())
-                              .toStringAsFixed(2),
-                          style: TextStyle(color: Colors.grey, fontSize: 14),
-                        ),
-                        Text(
-                          double.parse(
-                            passedCoins![index].changePercent24Hr.toString(),
-                          ).toStringAsFixed(2),
-                          style: TextStyle(
-                              color: getBenefitOrDamageColor(
-                                double.parse(
-                                  passedCoins![index]
-                                      .changePercent24Hr
-                                      .toString(),
+          child: Column(
+        children: [
+          TextField(),
+          Expanded(
+            child: RefreshIndicator(
+              color: Colors.white,
+              backgroundColor: Color.fromARGB(255, 38, 252, 202),
+              child: ListView.builder(
+                itemCount: passedCoins!.length,
+                itemBuilder: (context, index) {
+                  return ListTile(
+                    leading: Text(
+                      passedCoins![index].rank.toString(),
+                      style: TextStyle(color: Colors.white),
+                    ),
+                    trailing: Container(
+                      width: 100,
+                      child: Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              crossAxisAlignment: CrossAxisAlignment.end,
+                              children: [
+                                Text(
+                                  double.parse(passedCoins![index]
+                                          .priceUsd
+                                          .toString())
+                                      .toStringAsFixed(2),
+                                  style: TextStyle(
+                                      color: Colors.grey, fontSize: 14),
                                 ),
+                                Text(
+                                  double.parse(
+                                    passedCoins![index]
+                                        .changePercent24Hr
+                                        .toString(),
+                                  ).toStringAsFixed(2),
+                                  style: TextStyle(
+                                      color: getBenefitOrDamageColor(
+                                        double.parse(
+                                          passedCoins![index]
+                                              .changePercent24Hr
+                                              .toString(),
+                                        ),
+                                      ),
+                                      fontSize: 10),
+                                ),
+                              ],
+                            ),
+                            SizedBox(
+                              width: 12,
+                            ),
+                            getBenefitOrDamageIcon(
+                              double.parse(
+                                passedCoins![index]
+                                    .changePercent24Hr
+                                    .toString(),
                               ),
-                              fontSize: 10),
-                        ),
-                      ],
+                            ),
+                          ]),
                     ),
-                    SizedBox(
-                      width: 12,
+                    title: Text(
+                      passedCoins![index].name.toString(),
+                      style:
+                          TextStyle(color: Color.fromARGB(255, 38, 252, 202)),
                     ),
-                    getBenefitOrDamageIcon(
-                      double.parse(
-                        passedCoins![index].changePercent24Hr.toString(),
-                      ),
-                    ),
-                  ]),
-                ),
-                title: Text(
-                  passedCoins![index].name.toString(),
-                  style: TextStyle(color: Color.fromARGB(255, 38, 252, 202)),
-                ),
-              );
-            },
+                  );
+                },
+              ),
+              onRefresh: () {
+                getFreshData();
+                return Future<void>.delayed(
+                  Duration(seconds: 3),
+                );
+              },
+            ),
           ),
-          onRefresh: () {
-            getFreshData();
-            return Future<void>.delayed(
-              Duration(seconds: 3),
-            );
-          },
-        ),
-      ),
+        ],
+      )),
     );
   }
 
