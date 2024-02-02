@@ -15,6 +15,7 @@ class CoinsListPage extends StatefulWidget {
 
 class _CoinsListPageState extends State<CoinsListPage> {
   List<Coins>? passedCoins;
+  bool showLoading = false;
 
   @override
   void initState() {
@@ -36,7 +37,43 @@ class _CoinsListPageState extends State<CoinsListPage> {
       body: SafeArea(
           child: Column(
         children: [
-          TextField(),
+          Visibility(
+            visible: showLoading,
+            child: Container(
+              height: 40,
+              child: Center(
+                child: Text(
+                  'please wait for loading data',
+                  style: TextStyle(
+                    color: Color.fromARGB(255, 36, 255, 197),
+                  ),
+                ),
+              ),
+            ),
+          ),
+          TextField(
+            style: TextStyle(
+              color: Colors.white,
+              fontSize: 18,
+            ),
+            cursorColor: Colors.white,
+            decoration: InputDecoration(
+              filled: true,
+              hintText: 'please enter your coin!',
+              hintStyle: TextStyle(color: Colors.white),
+              border: OutlineInputBorder(
+                borderSide: BorderSide(
+                  style: BorderStyle.none,
+                  width: 0,
+                ),
+                borderRadius: BorderRadius.circular(10),
+              ),
+              fillColor: Color.fromARGB(255, 36, 229, 178),
+            ),
+            onChanged: (value) {
+              getFilteredData(value);
+            },
+          ),
           Expanded(
             child: RefreshIndicator(
               color: Colors.white,
@@ -50,7 +87,7 @@ class _CoinsListPageState extends State<CoinsListPage> {
                       style: TextStyle(color: Colors.white),
                     ),
                     trailing: Container(
-                      width: 100,
+                      width: 150,
                       child: Row(
                           mainAxisAlignment: MainAxisAlignment.end,
                           children: [
@@ -60,18 +97,20 @@ class _CoinsListPageState extends State<CoinsListPage> {
                               children: [
                                 Text(
                                   double.parse(passedCoins![index]
-                                          .priceUsd
-                                          .toString())
-                                      .toStringAsFixed(2),
+                                              .priceUsd
+                                              .toString())
+                                          .toStringAsFixed(2) +
+                                      ' \$',
                                   style: TextStyle(
                                       color: Colors.grey, fontSize: 14),
                                 ),
                                 Text(
                                   double.parse(
-                                    passedCoins![index]
-                                        .changePercent24Hr
-                                        .toString(),
-                                  ).toStringAsFixed(2),
+                                        passedCoins![index]
+                                            .changePercent24Hr
+                                            .toString(),
+                                      ).toStringAsFixed(2) +
+                                      '%',
                                   style: TextStyle(
                                       color: getBenefitOrDamageColor(
                                         double.parse(
@@ -143,7 +182,7 @@ class _CoinsListPageState extends State<CoinsListPage> {
     }
   }
 
-  void getFreshData() async {
+  Future<void> getFreshData() async {
     Response res = await Dio().get('https://api.coincap.io/v2/assets');
     var data = res.data['data'];
     List<Coins> freshList = data
@@ -152,6 +191,35 @@ class _CoinsListPageState extends State<CoinsListPage> {
 
     setState(() {
       passedCoins = freshList;
+    });
+  }
+
+  Future<void> getFilteredData(String value) async {
+    if (value.isEmpty) {
+      setState(() {
+        showLoading = true;
+      });
+
+      getFreshData();
+      await Future.delayed(
+        Duration(seconds: 2),
+      );
+      setState(() {
+        showLoading = false;
+      });
+      return;
+    }
+
+    List<Coins> filteredList = passedCoins!.where((element) {
+      if (element.name!.toLowerCase().contains(value.toLowerCase())) {
+        return true;
+      } else {
+        return false;
+      }
+    }).toList();
+
+    setState(() {
+      passedCoins = filteredList;
     });
   }
 }
